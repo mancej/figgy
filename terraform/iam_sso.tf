@@ -3,7 +3,7 @@
 resource "aws_iam_saml_provider" "provider" {
   count = local.enable_sso ? length(local.auth_types) : 0
   name                   = local.auth_types[count.index]
-  saml_metadata_document = file("saml/metadata-${local.auth_types[count.index]}.xml")
+  saml_metadata_document = length(local.auth_types) > 1 ? file("saml/metadata-${local.auth_types[count.index]}.xml") : file("saml/metadata.xml")
 }
 
 # Be careful if you change this name, it is used by SSO integrations. When we retrieve the SAML assertion from our SSO provider,

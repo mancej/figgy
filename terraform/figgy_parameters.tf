@@ -42,7 +42,6 @@ EOF
 
 # These are used by figgy CLI to help the CLI only show the user parameters they have access to
 resource "aws_ssm_parameter" "profile_kms_keys" {
-  count = length(local.role_types)
   name  = "/figgy/rbac/profile/keys"
   type  = "String"
   value = jsonencode(local.encryption_keys)
