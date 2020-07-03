@@ -1,6 +1,0 @@
-{
-  "replicate_figs": {
-    "/dba/secrets/mysql/shared/data-changer/user": "/app/data-changer/replicated/secrets/mysql/user",
-    "/dba/secrets/mysql/shared/data-changer/password" : "/app/data-changer/replicated/secrets/mysql/password"
-  }
-}

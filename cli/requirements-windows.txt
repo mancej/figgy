@@ -1,4 +1,0 @@
-pyreadline==2.1
-windows-curses==2.1.0
-pywin32
-pycryptodome==3.9.7

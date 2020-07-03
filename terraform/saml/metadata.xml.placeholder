@@ -1,0 +1,4 @@
+# In here you would add your metadata.xml from your SAML provider. This will make it so your SAML provider can
+# authenticate with AWS :)
+
+This is a SECRET - DO NOT CHECK THIS IN! Just add it here before running "terraform apply" if you like.

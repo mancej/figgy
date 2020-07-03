@@ -2,58 +2,58 @@ version: 2
 
 jobs:
 
-  test:
-    docker:
-    # name of root build image
-    - image: circleci/python:3.7.1
-      environment:
-        TERM: "xterm" ## For some circleci base containers, it needs to be set. Circleci wonkiness.
-
-    steps:
-      - checkout
-      - run:
-          name: Download and Install pip
-          command: |
-            if [[ ! -e ~/cache/get-pip.py ]]; then
-              mkdir -p ~/cache && curl "https://bootstrap.pypa.io/get-pip.py" > ~/cache/get-pip.py
-            fi
-
-            pip || sudo python ~/cache/get-pip.py
-
-      - run:
-          name: Install awscli
-          command: sudo pip install awscli
-
-      - run:
-          name: Configure aws cli
-          command: |
-            # Configure aws cli
-            mkdir -p ~/.aws
-
-            echo "[$MFA_PROFILE_NAME]" >> ~/.aws/credentials
-            echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> ~/.aws/credentials
-            echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials
-            echo "[$MFA_PROFILE_NAME]" >> ~/.aws/config
-            echo "region = us-east-1" >> ~/.aws/config
-            echo "output = json" >> ~/.aws/config
-
-      - run:
-          name: Install requirements and run tests
-          command: |
-            sudo apt-get update
-            sudo apt-get install libdbus-glib-1-dev
-
-            cd support/figgy
-            sudo pip install keyrings.alt
-
-            echo "Installing requirements!"
-            sudo pip install -r requirements.txt
-            mkdir -p ~/.figgy/devops/cache/sts
-
-            echo "Running tests!!!"
-
-            mfa set $MFA_USER $MFA_SECRET
-            python run_tests.py
+#  test:
+#    docker:
+#    # name of root build image
+#    - image: circleci/python:3.7.1
+#      environment:
+#        TERM: "xterm" ## For some circleci base containers, it needs to be set. Circleci wonkiness.
+#
+#    steps:
+#      - checkout
+#      - run:
+#          name: Download and Install pip
+#          command: |
+#            if [[ ! -e ~/cache/get-pip.py ]]; then
+#              mkdir -p ~/cache && curl "https://bootstrap.pypa.io/get-pip.py" > ~/cache/get-pip.py
+#            fi
+#
+#            pip || sudo python ~/cache/get-pip.py
+#
+#      - run:
+#          name: Install awscli
+#          command: sudo pip install awscli
+#
+#      - run:
+#          name: Configure aws cli
+#          command: |
+#            # Configure aws cli
+#            mkdir -p ~/.aws
+#
+#            echo "[$MFA_PROFILE_NAME]" >> ~/.aws/credentials
+#            echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> ~/.aws/credentials
+#            echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials
+#            echo "[$MFA_PROFILE_NAME]" >> ~/.aws/config
+#            echo "region = us-east-1" >> ~/.aws/config
+#            echo "output = json" >> ~/.aws/config
+#
+#      - run:
+#          name: Install requirements and run tests
+#          command: |
+#            sudo apt-get update
+#            sudo apt-get install libdbus-glib-1-dev
+#
+#            cd support/figgy
+#            sudo pip install keyrings.alt
+#
+#            echo "Installing requirements!"
+#            sudo pip install -r requirements.txt
+#            mkdir -p ~/.figgy/devops/cache/sts
+#
+#            echo "Running tests!!!"
+#
+#            mfa set $MFA_USER $MFA_SECRET
+#            python run_tests.py
 
   build_windows:
     docker:
@@ -168,21 +168,10 @@ jobs:
             echo "Running pyinstaller to build figgy"
             DISPLAY=:1 wine pyinstaller figgy.py --onefile --hiddenimport configparser --hiddenimport pyreadline --hiddenimport win32timezone --hiddenimport keyrings  --hiddenimport pkg_resources.py2_warn --hiddenimport keyring.backends
 
-            dest="s3://old-bucket-id/figgy/latest/windows/figgy.exe"
+            dest="s3://figgy-website/releases/cli/latest/windows/figgy.exe"
 
             echo "Deploying Windows figgy.exe to: $dest"
             aws s3 cp dist/figgy.exe $dest
-
-            # Cleanup dist.
-            rm -rf dist/*
-
-            # Build credentials exporter gui
-            dest="s3://old-bucket-id/credentials_manager/latest/windows/credentials-mgr.exe"
-            DISPLAY=:1 wine pyinstaller extras/export_credentials.py --onefile --log-level=DEBUG  --hiddenimport configparser --hiddenimport pkg_resources.py2_warn
-            chmod u+x dist/export_credentials.exe
-
-            echo "Deploying Windows Credentials Exporter to: $dest"
-            aws s3 cp dist/export_credentials.exe $dest
 
   build_linux:
     docker:
@@ -219,7 +208,7 @@ jobs:
             sudo pip install -r requirements-linux.txt
 
             pyinstaller figgy.py --onefile --log-level=DEBUG --hiddenimport configparser --hiddenimport keyrings --hiddenimport keyring.backends --hiddenimport pkg_resources.py2_warn
-            dest="s3://old-bucket-id/figgy/latest/linux/figgy"
+            dest="s3://figgy-website/releases/latest/linux/figgy"
 
             echo "Deploying linux figgy to $dest"
             aws s3 cp dist/figgy $dest
@@ -248,7 +237,7 @@ jobs:
 
             ## Build OneFile
             pyinstaller figgy.py --onefile --log-level=DEBUG --hiddenimport configparser --hiddenimport keyrings --hiddenimport keyring.backends --hiddenimport pycrypto  --hiddenimport pkg_resources.py2_warn
-            dest="s3://old-bucket-id/figgy/latest/darwin/figgy"
+            dest="s3://figgy-website/releases/cli/latest/darwin/figgy"
 
             ## Build OneDir
             echo "Deploying OSX figgy to $dest"
@@ -260,62 +249,41 @@ jobs:
             cd dist/figgy
             zip -r figgy.zip .
 
-            dest="s3://old-bucket-id/figgy/latest/darwin/figgy.zip"
+            dest="s3://figgy-website/releases/cli/latest/darwin/figgy.zip"
             aws s3 cp figgy.zip $dest
-            cd ../../
-
-            ## Build Credential exporter gui
-            rm -rf dist/*
-            pyinstaller extras/export_credentials.py --onefile --log-level=DEBUG --hiddenimport configparser  --hiddenimport pkg_resources.py2_warn
-            dest="s3://old-bucket-id/credentials_manager/latest/darwin/credentials-mgr"
-
-            chmod u+x dist/export_credentials
-            echo "Deploying OSX figgy to $dest"
-            aws s3 cp dist/export_credentials $dest
 
 
 workflows:
   version: 2
   build_all:
     jobs:
-      - test:
-          context: cicd-test
-          filters:
-            branches:
-              only:
-              - master
-              - develop
       - build_windows:
-          context: cicd-default
+          context: cicd-context
           requires:
-            - test
+            - build_linux
           filters:
             branches:
               only:
                 - master
                 - windows
-      - build_devopsci:
-          context: cicd-default
-          filters:
-            branches:
-              only:
-                - master
-                - linux
+                - develop
       - build_linux:
-          context: cicd-default
+          context: cicd-context
           requires:
-            - test
+            - build_mac
           filters:
             branches:
               only:
               - master
+              - develop
       - build_mac:
-          context: cicd-default
+          context: cicd-context
           filters:
             branches:
               only:
               - master
               - mac
+              - develop
 
 
 

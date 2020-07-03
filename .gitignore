@@ -32,3 +32,6 @@ share/python-wheels/
 *.egg
 MANIFEST
 assertion.xml
+#
+## Pyinstalelr stuffs
+#*.spec

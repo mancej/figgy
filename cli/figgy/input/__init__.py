@@ -1,1 +1,0 @@
-from figgy.input.input import Input

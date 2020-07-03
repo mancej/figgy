@@ -1,6 +1,0 @@
-{
-  "replicate_figs": {
-    "/dba/credentials/mongo/figgy-demo-shared/password": "/app/figgy-demo-shared/db/password",
-    "/dba/credentials/mongo/figgy-demo-shared/user": "/app/figgy-demo-shared/db/user"
-  }
-}

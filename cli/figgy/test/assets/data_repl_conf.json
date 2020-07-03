@@ -1,8 +1,0 @@
-{
-  "replicate_figs": {
-    "/data/test/jordan/1": "/app/ci-test-2/replicated/jordan/test/1",
-    "/shared/test/jordan/2" : "/app/ci-test-2/replicated/jordan/test/2",
-    "/data/test/jordan/3" : "/app/ci-test-2/replicated/jordan/test/3",
-    "/data/mongo/replicasets/default" : "/app/ci-test-2/replicated/jordan/test/4"
-  }
-}
