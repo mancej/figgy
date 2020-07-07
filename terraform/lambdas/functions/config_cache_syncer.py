@@ -7,6 +7,7 @@ import json
 from config.constants import *
 from lib.data.dynamo.config_cache_dao import ConfigCacheDao, ConfigItem
 from lib.data.ssm.ssm import SsmDao
+from lib.models.slack import SimpleSlackMessage, SlackColor
 from lib.svcs.slack import SlackService
 from lib.utils.utils import Utils
 
@@ -60,10 +61,18 @@ def handle(event, context):
 
     except Exception as e:
         log.error(e)
-        slack.send_error(title="Figgy experienced an irrecoverable error!",
-                         message=f"The following error occurred in an the figgy-ssm-stream-replicator lambda. "
-                                 f"If this appears to be a bug with figgy, please tell us by submitting a GitHub issue!"
-                                 f" \n\n{Utils.printable_exception(e)}")
+        title = "Figgy experienced an irrecoverable error!"
+        message = f"The following error occurred in an the figgy-ssm-stream-replicator lambda. "\
+                  f"If this appears to be a bug with figgy, please tell us by submitting a GitHub issue!"\
+                  f" \n\n{Utils.printable_exception(e)}"
+
+        message = SimpleSlackMessage(
+            title=title,
+            message=message,
+            color=SlackColor.RED
+        )
+        slack.send_message(message)
+
         raise e
 
 

@@ -13,33 +13,7 @@ class SlackService:
 
     def send_message(self, message: SlackMessage):
         if self.webhook_url:
-            slack_message = {
-                "attachments": [
-                    {
-                        "attachment_type": "default",
-                        "title": f"{message.title}",
-                        "text": f"{message.message}",
-                        "color": f"{message.color.value}"
-                    }
-                ]
-            }
-
-            requests.post(self.webhook_url, json.dumps(slack_message))
-        else:
-            log.warning(f"Slack webhook unconfigured. Ignoring effort to submit Slack Notification.")
-
-    def send_error(self, title: str, message: str):
-        if self.webhook_url:
-            slack_message = {
-                "attachments": [
-                    {
-                        "attachment_type": "default",
-                        "title": f"{title}",
-                        "text": f"{message}",
-                        "color": f"{SlackColor.RED.value}"
-                    }
-                ]
-            }
+            slack_message = message.slack_format()
             requests.post(self.webhook_url, json.dumps(slack_message))
         else:
             log.warning(f"Slack webhook unconfigured. Ignoring effort to submit Slack Notification.")

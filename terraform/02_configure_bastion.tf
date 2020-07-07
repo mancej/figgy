@@ -1,6 +1,11 @@
 # THIS IS OPTIONAL. Only configure this if you are using bastion-account-based authentication and _not_ SSO authentication.
 
 locals {
+  # MFA Enabled - "true/false" - Require MFA for authentication for bastion based auth? For SSO users MFA
+  # is managed by your SSO provider. This is only for `bastion` MFA enforcement.
+  # The CLI supports MFA for SSO / Bastion auth types.
+  mfa_enabled = true
+
   # Please provide a mapping from all AWS "environments" to their respective account Ids
   # Format: "env" -> "account_id" (THESE MUST MAP to the var.run_env values you're using in your variables files)
   associated_accounts = tomap({

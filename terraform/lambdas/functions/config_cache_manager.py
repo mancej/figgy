@@ -4,6 +4,7 @@ import boto3
 import logging
 
 from lib.data.ssm import SsmDao
+from lib.models.slack import SimpleSlackMessage, SlackColor
 from lib.svcs.slack import SlackService
 from lib.utils.utils import Utils
 from config.constants import *
@@ -55,10 +56,16 @@ def handle(event, context):
             log.info(f"Unsupported action type found! --> {action}")
     except Exception as e:
         log.error(e)
-        slack.send_error(title=f"Figgy experienced an irrecoverable error! In account: {ACCOUNT_ID[0:5]}[REDACTED]",
-                         message=f"The following error occurred in an the figgy-config-cache-manager lambda. "
-                                 f"If this appears to be a bug with figgy, please tell us by submitting a GitHub issue!"
-                                 f" \n\n{Utils.printable_exception(e)}")
+        title = f"Figgy experienced an irrecoverable error! In account: {ACCOUNT_ID[0:5]}[REDACTED]"
+        message = f"The following error occurred in an the figgy-config-cache-manager lambda. "
+        f"If this appears to be a bug with figgy, please tell us by submitting a GitHub issue!"
+        f" \n\n{Utils.printable_exception(e)}"
+        message = SimpleSlackMessage(
+            title=title,
+            message=message,
+            color=SlackColor.RED
+        )
+        slack.send_message(message)
         raise e
 
 

@@ -5,7 +5,7 @@ from config.constants import *
 from lib.models.replication_config import ReplicationConfig
 from lib.data.dynamo.audit_dao import AuditDao
 from lib.data.ssm import SsmDao
-from lib.models.slack import SlackMessage, SlackColor
+from lib.models.slack import FigDeletedMessage, SlackColor, SimpleSlackMessage
 from lib.svcs.slack import SlackService
 from lib.utils.utils import Utils
 
@@ -23,15 +23,12 @@ ACCOUNT_ENV = ssm.get_parameter_value(ACCOUNT_ENV_PS_PATH)
 NOTIFY_DELETES = ssm.get_parameter_value(NOTIFY_DELETES_PS_PATH)
 NOTIFY_DELETES = NOTIFY_DELETES.lower() == "true" if NOTIFY_DELETES else False
 
+
 def notify_delete(ps_name: str, user: str):
     if NOTIFY_DELETES:
-        message = SlackMessage(
-            color=SlackColor.ORANGE,
-            title="Figgy Event: Fig Deleted.",
-            message=f"Fig: {ps_name} was deleted by: {user} in account: {ACCOUNT_ENV}"
+        slack.send_message(
+            FigDeletedMessage(name=ps_name, user=user, environment=ACCOUNT_ENV)
         )
-
-        slack.send_message(message)
 
 
 def handle(event, context):
@@ -102,10 +99,17 @@ def handle(event, context):
 
     except Exception as e:
         log.error(e)
-        slack.send_error(title="Figgy experienced an irrecoverable error!",
-                         message=f"The following error occurred in an the figgy-ssm-stream-replicator lambda. "
-                                 f"If this appears to be a bug with figgy, please tell us by submitting a GitHub issue!"
-                                 f" \n\n{Utils.printable_exception(e)}")
+        message = f"The following error occurred in an the figgy-ssm-stream-replicator lambda. " \
+                  f"If this appears to be a bug with figgy, please tell us by submitting a GitHub issue!" \
+                  f" \n\n{Utils.printable_exception(e)}"
+
+        title = "Figgy experienced an irrecoverable error!"
+        message = SimpleSlackMessage(
+            title=title,
+            message=message,
+            color=SlackColor.RED
+        )
+        slack.send_message(message)
         raise e
 
 

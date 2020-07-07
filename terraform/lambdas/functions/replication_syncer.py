@@ -9,7 +9,7 @@ from lib.data.ssm.ssm import SsmDao
 from lib.models.replication_config import ReplicationConfig
 from lib.svcs.replication import ReplicationService
 from lib.svcs.slack import SlackService
-from lib.models.slack import SlackColor, SlackMessage
+from lib.models.slack import SlackColor, SlackMessage, FigReplicationMessage, SimpleSlackMessage
 from config.constants import FIGGY_WEBHOOK_URL_PATH
 from lib.utils.utils import Utils
 
@@ -23,13 +23,7 @@ log = Utils.get_logger(__name__, logging.INFO)
 
 
 def notify_slack(config: ReplicationConfig):
-    message = SlackMessage(
-        color=SlackColor.GREEN,
-        title="Figgy Event: Figgy replication sync completed.",
-        message=f"Replication synced successfully: `{config.source}` -> `{config.destination}`. \n"
-                f"Configured by: {config.user}."
-    )
-
+    message = FigReplicationMessage(replication_cfg=config)
     slack.send_message(message)
 
 
@@ -44,10 +38,12 @@ def handle(event, context):
                 notify_slack(config)
     except Exception as e:
         log.error(e)
-        slack.send_error(title="Figgy experienced an irrecoverable error!",
-                         message=f"The following error occurred in an the *figgy-replication-syncer* lambda. "
-                                 f"If this appears to be a bug with figgy, please tell us by submitting a GitHub issue!"
-                                 f" \n\n```{Utils.printable_exception(e)}```")
+        title = "Figgy experienced an irrecoverable error!"
+        message=f"The following error occurred in an the *figgy-replication-syncer* lambda. " \
+                f"If this appears to be a bug with figgy, please tell us by submitting a GitHub issue!" \
+                f" \n\n```{Utils.printable_exception(e)}```"
+        message = SimpleSlackMessage(title=title, message=message, color=SlackColor.RED)
+        slack.send_message(message)
         raise e
 
 

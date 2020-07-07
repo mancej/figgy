@@ -6,7 +6,7 @@ from config.constants import *
 from lib.models.replication_config import ReplicationType, ReplicationConfig
 from lib.data.dynamo.replication_dao import ReplicationDao
 from lib.data.ssm.ssm import SsmDao
-from lib.models.slack import SlackMessage, SlackColor
+from lib.models.slack import SlackMessage, SlackColor, FigReplicationMessage, SimpleSlackMessage
 from lib.svcs.replication import ReplicationService
 from lib.svcs.slack import SlackService
 from lib.utils.utils import Utils
@@ -21,15 +21,9 @@ slack: SlackService = SlackService(webhook_url=webhook_url)
 
 ACCOUNT_ID = ssm.get_parameter_value(ACCOUNT_ID_PS_PATH)
 
-def notify_slack(config: ReplicationConfig, user: str):
-    message = SlackMessage(
-        color=SlackColor.GREEN,
-        title="Figgy Event: A source of replication was updated.",
-        message=f"{user} updated value at `{config.source}`. \n"
-                f"This triggered replication from `{config.source}` -> `{config.destination}`. "
-                f"Replication was successful."
-    )
 
+def notify_slack(config: ReplicationConfig, triggering_user: str):
+    message = FigReplicationMessage(replication_cfg=config, triggering_user=triggering_user)
     slack.send_message(message)
 
 
@@ -65,14 +59,14 @@ def handle(event, context):
             return
 
         ps_name = detail.get('requestParameters', {}).get('name')
-        user = parse_user(detail)
+        triggering_user = parse_user(detail)
 
         if ps_name and action == PUT_PARAM_ACTION:
             repl_configs: List[ReplicationConfig] = repl_dao.get_config_repl_by_source(ps_name)
             merge_configs: List[ReplicationConfig] = repl_dao.get_configs_by_type(ReplicationType(REPL_TYPE_MERGE))
             for config in repl_configs:
                 updated = repl_svc.sync_config(config)
-                updated and notify_slack(config, user)  # Notify on update
+                updated and notify_slack(config, triggering_user)  # Notify on update
 
             for config in merge_configs:
                 log.info(f"Evaluating config: {config}")
@@ -80,8 +74,9 @@ def handle(event, context):
                     for source in config.source:
                         if ps_name in source:
                             updated = repl_svc.sync_config(config)
-                            updated and notify_slack(config, user)
+                            updated and notify_slack(config, triggering_user)
                             continue
+
         elif action == DELETE_PARAM_ACTION or action == DELETE_PARAMS_ACTION:
             log.info("Delete found, skipping...")
         else:
@@ -89,11 +84,14 @@ def handle(event, context):
 
     except Exception as e:
         log.error(e)
-        slack.send_error(title="Figgy experienced an irrecoverable error!",
-                         message=f"The following error occurred in an the figgy-ssm-stream-replicator lambda. \n"
-                                 f"Figgy is designed to backoff and continually retry in the face of errors. \n"
-                                 f"If this appears to be a bug with figgy, please tell us by submitting a GitHub issue!"
-                                 f" \n\n```{Utils.printable_exception(e)}```")
+        title = "Figgy experienced an irrecoverable error!"
+        message = f"The following error occurred in an the figgy-ssm-stream-replicator lambda. \n" \
+                  f"Figgy is designed to backoff and continually retry in the face of errors. \n" \
+                  f"If this appears to be a bug with figgy, please tell us by submitting a GitHub issue!" \
+                  f" \n\n```{Utils.printable_exception(e)}```"
+
+        message = SimpleSlackMessage(title=title, message=message, color=SlackColor.RED)
+        slack.send_message(message)
         raise e
 
 
