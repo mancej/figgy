@@ -56,7 +56,8 @@ class FigReplicationMessage(SlackMessage):
 
         text = f"*Source*:   `{self.replication_cfg.source}`\n" \
                f"*Dest*:       `{self.replication_cfg.destination}`\n" \
-               f"*Owner*:   `{self.replication_cfg.user}`\n" \
+               f"*Owner*:    {self.replication_cfg.user}\n" \
+               f"*Env*:          {self.replication_cfg.run_env}\n"\
                f"{extra_note}" \
                f"For more information on what this means, check out the " \
                "<https://www.figgy.dev/docs/getting-started/basics/#the-solution-config-replication|Figgy Docs>"
@@ -85,7 +86,7 @@ class FigReplicationMessage(SlackMessage):
                                 },
                                 "accessory": {
                                     "type": "image",
-                                    "image_url": "https://www.figgy.dev/assets/img/sample/logo-black.png",
+                                    "image_url": "https://github.com/figtools/figgy/raw/master/.assets/logo.png",
                                     "alt_text": "Figgy"
                                 }
                             },
@@ -133,12 +134,11 @@ class FigDeletedMessage(SlackMessage):
                                     "type": "mrkdwn",
                                     "text": f"*Deleted*:    `{self.name}`\n"
                                             f"*By User*:    `{self.user}`\n"
-                                            f"The above configuration was deleted in the *{self.environment}*"
-                                            f" environment."
+                                            f"*Env*:           {self.environment}"
                                 },
                                 "accessory": {
                                     "type": "image",
-                                    "image_url": "https://www.figgy.dev/assets/img/sample/logo-black.png",
+                                    "image_url": "https://github.com/figtools/figgy/raw/master/.assets/logo.png",
                                     "alt_text": "Figgy"
                                 }
                             }
