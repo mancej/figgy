@@ -35,3 +35,8 @@ resource "aws_cloudwatch_event_target" "push_event" {
   target_id = "push-ps-events"
   arn       = "arn:aws:events:${var.region}:${local.bastion_account_number}:event-bus/default"
 }
+
+
+resource "aws_sns_topic" "figgy_alarms" {
+  name = "figgy-alarms"
+}

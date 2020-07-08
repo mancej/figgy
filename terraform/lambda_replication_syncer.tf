@@ -9,6 +9,7 @@ module "replication_syncer" {
   zip_path = data.archive_file.figgy.output_path
   layers = [local.aws_sdk_layer_map[var.region]]
   cw_lambda_log_retention = var.figgy_cw_log_retention
+  sns_alarm_topic = aws_sns_topic.figgy_alarms.arn
 }
 
 module "replication_syncer_trigger" {

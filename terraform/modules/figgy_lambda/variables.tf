@@ -39,3 +39,7 @@ variable "cw_lambda_log_retention" {
   description = "# of days to keep figgy lambda logs in cloudwatch"
   default = 30
 }
+
+variable "sns_alarm_topic" {
+  description = "ARN for SNS topic for triggered CloudWatch alarm notifications to."
+}
