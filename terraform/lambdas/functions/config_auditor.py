@@ -1,4 +1,6 @@
 import random
+import time
+
 import boto3
 import logging
 from config.constants import *
@@ -23,6 +25,9 @@ ACCOUNT_ENV = ssm.get_parameter_value(ACCOUNT_ENV_PS_PATH)
 NOTIFY_DELETES = ssm.get_parameter_value(NOTIFY_DELETES_PS_PATH)
 NOTIFY_DELETES = NOTIFY_DELETES.lower() == "true" if NOTIFY_DELETES else False
 
+CLEANUP_INTERVAL = 60 * 60  # Cleanup hourly
+LAST_CLEANUP = 0
+
 
 def notify_delete(ps_name: str, user: str):
     if NOTIFY_DELETES:
@@ -32,6 +37,8 @@ def notify_delete(ps_name: str, user: str):
 
 
 def handle(event, context):
+    global LAST_CLEANUP
+
     # Don't process other account's events.
     originating_account = event.get('account')
     if originating_account != ACCOUNT_ID:
@@ -43,15 +50,22 @@ def handle(event, context):
         detail = event["detail"]
         user_arn = detail["userIdentity"]["arn"]
         user = user_arn.split("/")[-1:][0]
-        action = detail["eventName"]
+        action = detail.get("eventName")
 
         if 'errorMessage' in detail:
             log.info(f'Not processing event due to this being an error event with message: {detail["errorMessage"]}')
             return
 
-        ps_name = detail.get('requestParameters', {}).get('name')
+        request_params = detail.get('requestParameters', {})
+        ps_names = request_params.get('names', [])
+        ps_name = [request_params['name']] if 'name' in request_params else []
+        ps_names = ps_names + ps_name
 
-        if ps_name:
+        log.info(f"Got user: {user}, action: {action} for parameter(s) {ps_names}")
+
+        for ps_name in ps_names:
+            ps_name = f'/{ps_name}' if not ps_name.startswith('/') else ps_name
+
             if action == DELETE_PARAM_ACTION or action == DELETE_PARAMS_ACTION:
                 audit.put_delete_log(user, action, ps_name)
                 notify_delete(ps_name, user)
@@ -90,12 +104,13 @@ def handle(event, context):
             else:
                 log.info(f"Unsupported action type found! --> {action}")
 
-            # this requires a table scan, so don't do this _EVERY_ run. No big deal. 1 in 30 chance.
-        if random.randint(1, 30) == 3:
+        # This will occassionally cleanup parameters with the explict value of DELETE_ME.
+        # Great for testing and adding PS parameters
+        # you don't want to be restored later on.
+        if time.time() - CLEANUP_INTERVAL > LAST_CLEANUP:
             log.info("Cleaning up.")
             audit.cleanup_test_logs()
-        else:
-            log.info("Skipping cleanup.")
+            LAST_CLEANUP = time.time()
 
     except Exception as e:
         log.error(e)

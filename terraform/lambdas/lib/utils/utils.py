@@ -14,8 +14,7 @@ class Utils:
     @staticmethod
     def validate(bool, error_msg):
         if not bool:
-            print(f"'ERROR: ' {error_msg}")
-            exit(1)
+            raise ValueError(error_msg)
 
     @staticmethod
     def get_logger(name, log_level):
