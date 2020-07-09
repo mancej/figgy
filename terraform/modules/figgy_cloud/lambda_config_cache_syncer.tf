@@ -1,6 +1,6 @@
 module "config_cache_syncer" {
   source                  = "../figgy_lambda"
-  deploy_bucket           = var.deploy_bucket
+  deploy_bucket           = local.lambda_bucket
   description             = "Incrementally synchronizes the cache table used for auto-complete in the figgy CLI tool"
   handler                 = "functions/config_cache_syncer.handle"
   lambda_name             = "figgy-config-cache-syncer"
