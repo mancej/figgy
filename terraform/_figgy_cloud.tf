@@ -6,4 +6,10 @@ module "figgy_cloud" {
   region = var.region
   run_env = var.run_env
   cfgs = merge(local.cfgs, local.bastion_cfgs, local.other_cfgs)
+  extra_auth_types = var.extra_auth_types
+  figgy_cw_log_retention = var.figgy_cw_log_retention
+  max_session_duration = var.max_session_duration
+  notify_deletes = var.notify_deletes
+  webhook_url = var.webhook_url
+  sandbox_deploy = var.sandbox_deploy
 }
