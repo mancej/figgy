@@ -11,7 +11,7 @@ locals {
     create_deploy_bucket = true
 
     # Cloudtrail logging is required by Figgy we can turn it on for you, or you can enable it on your own.
-    # If you don't have it enabled, or want to enable it yourself, set this to false.
+    # If you already have it enabled, or want to enable it yourself, set this to false.
     configure_cloudtrail = true
 
     # How many unique roles will figgy users need? Each of these types should map to a particular figgy user story.

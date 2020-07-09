@@ -43,3 +43,7 @@ variable "cw_lambda_log_retention" {
 variable "sns_alarm_topic" {
   description = "ARN for SNS topic for triggered CloudWatch alarm notifications to."
 }
+
+variable "sha256" {
+  description = "Sha256 of provided data archive"
+}

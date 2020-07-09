@@ -11,7 +11,7 @@ resource "aws_lambda_function" "figgy_lambda" {
   runtime          = "python3.7"
   description      = var.description
   timeout          = var.lambda_timeout
-  source_code_hash = filebase64sha256(var.zip_path)
+  source_code_hash = var.sha256
   reserved_concurrent_executions = var.concurrent_executions
   depends_on       = [aws_iam_role.figgy_role, aws_s3_bucket_object.figgy_deploy]
   layers = var.layers
@@ -21,7 +21,7 @@ resource "aws_s3_bucket_object" "figgy_deploy" {
   bucket = var.deploy_bucket
   key    = local.deploy_path
   source = var.zip_path
-  etag = filemd5(var.zip_path)
+  etag = var.sha256
 }
 
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
