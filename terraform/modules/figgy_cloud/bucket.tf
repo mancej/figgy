@@ -25,7 +25,6 @@ resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
   count  = var.cfgs.create_deploy_bucket == true && var.cfgs.configure_cloudtrail ? 1 : 0
   bucket = var.deploy_bucket
   depends_on = [aws_s3_bucket.figgy_bucket]
-
   policy = <<POLICY
 {
     "Version": "2012-10-17",
