@@ -1,6 +1,6 @@
 module "ssm_stream_replicator" {
   source                  = "../figgy_lambda"
-  deploy_bucket           = local.lambda_bucket_id
+  deploy_bucket           = var.cfgs.deploy_bucket
   description             = "Listens to the CW event stream for SSM events and triggers replication if replication sources are changed."
   handler                 = "functions/ssm_stream_replicator.handle"
   lambda_name             = "figgy-ssm-stream-replicator"

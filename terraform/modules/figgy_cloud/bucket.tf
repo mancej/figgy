@@ -58,6 +58,9 @@ resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
     ]
 }
 POLICY
+
+  depends_on = [aws_s3_bucket.figgy_bucket]
+
 }
 
 resource "aws_cloudtrail" "figgy_cloudtrail" {
@@ -66,8 +69,4 @@ resource "aws_cloudtrail" "figgy_cloudtrail" {
   s3_bucket_name                = var.deploy_bucket
   include_global_service_events = false
   depends_on                    = [aws_s3_bucket_policy.cloudtrail_bucket_policy]
-}
-
-locals {
-  lambda_bucket_id = var.cfgs.create_deploy_bucket == false ? var.deploy_bucket : aws_s3_bucket.figgy_bucket[0].id
 }

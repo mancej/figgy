@@ -1,6 +1,6 @@
 module "config_cache_manager" {
   source                  = "../figgy_lambda"
-  deploy_bucket           = local.lambda_bucket_id
+  deploy_bucket           = var.cfgs.deploy_bucket
   description             = "Manages a DDB cache of items that figgy uses to populate auto-complete for CLI users."
   handler                 = "functions/config_cache_manager.handle"
   lambda_name             = "figgy-config-cache-manager"
