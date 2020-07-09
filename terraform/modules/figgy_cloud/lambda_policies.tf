@@ -1,22 +1,22 @@
 # Default lambda policy
 resource "aws_iam_policy" "lambda_default" {
-  name = "figgy-default-lambda"
-  path = "/"
+  name        = "figgy-default-lambda"
+  path        = "/"
   description = "Default IAM policy for figgy lambda. Provides basic Lambda access, such as writing logs to CW."
-  policy = data.aws_iam_policy_document.lambda_default.json
+  policy      = data.aws_iam_policy_document.lambda_default.json
 }
 
 data "aws_iam_policy_document" "lambda_default" {
   statement {
     sid = "DefaultLambdaAccess"
     actions = [
-        "cloudwatch:Describe*",
-        "cloudwatch:Get*",
-        "cloudwatch:List*",
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents",
-        "logs:TestMetricFilter",
+      "cloudwatch:Describe*",
+      "cloudwatch:Get*",
+      "cloudwatch:List*",
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:TestMetricFilter",
     ]
 
     resources = ["*"]
@@ -25,10 +25,10 @@ data "aws_iam_policy_document" "lambda_default" {
 
 # Config Auditor Lambda
 resource "aws_iam_policy" "config_auditor" {
-  name = "config-auditor"
-  path = "/"
+  name        = "config-auditor"
+  path        = "/"
   description = "IAM policy for figgy confg_auditor lambda"
-  policy = data.aws_iam_policy_document.config_auditor_document.json
+  policy      = data.aws_iam_policy_document.config_auditor_document.json
 }
 
 data "aws_iam_policy_document" "config_auditor_document" {
@@ -49,22 +49,22 @@ data "aws_iam_policy_document" "config_auditor_document" {
 
   statement {
     sid = "AuditorPSRead"
-    actions =[
+    actions = [
       "ssm:GetParameter",
       "ssm:GetParameters",
       "ssm:List*",
       "ssm:DescribeParameters"
     ]
-    resources = [ "*" ]
+    resources = ["*"]
   }
 }
 
 # Config cache manager / syncer lambdas
 resource "aws_iam_policy" "config_cache_manager" {
-  name = "config-cache-manager"
-  path = "/"
+  name        = "config-cache-manager"
+  path        = "/"
   description = "IAM policy for figgy config_cache_manager/syncer lambdas"
-  policy = data.aws_iam_policy_document.config_cache_manager_document.json
+  policy      = data.aws_iam_policy_document.config_cache_manager_document.json
 }
 
 data "aws_iam_policy_document" "config_cache_manager_document" {
@@ -83,18 +83,18 @@ data "aws_iam_policy_document" "config_cache_manager_document" {
   }
 
   statement {
-    sid = "SSMDescribe"
-    actions = ["ssm:DescribeParameters"]
+    sid       = "SSMDescribe"
+    actions   = ["ssm:DescribeParameters"]
     resources = ["*"]
   }
 }
 
 # Replication lambdas policy
 resource "aws_iam_policy" "config_replication" {
-  name = "config-replication"
-  path = "/"
+  name        = "config-replication"
+  path        = "/"
   description = "IAM policy for figgy replication management lambdas"
-  policy = data.aws_iam_policy_document.config_replication_document.json
+  policy      = data.aws_iam_policy_document.config_replication_document.json
 }
 
 data "aws_iam_policy_document" "config_replication_document" {
@@ -110,7 +110,7 @@ data "aws_iam_policy_document" "config_replication_document" {
       "dynamodb:UpdateItem",
       "dynamodb:UpdateTimeToLive"
     ]
-    resources = [ aws_dynamodb_table.config_replication.arn ]
+    resources = [aws_dynamodb_table.config_replication.arn]
   }
 
   statement {
@@ -121,7 +121,7 @@ data "aws_iam_policy_document" "config_replication_document" {
       "dynamodb:ListStreams",
       "dynamodb:DescribeStream"
     ]
-    resources = [ aws_dynamodb_table.config_replication.stream_arn ]
+    resources = [aws_dynamodb_table.config_replication.stream_arn]
   }
 
   statement {
@@ -132,42 +132,42 @@ data "aws_iam_policy_document" "config_replication_document" {
       "kms:Encrypt"
     ]
 
-    resources = concat([ for x in aws_kms_key.encryption_key: x.arn ], [aws_kms_key.replication_key.arn])
+    resources = concat([for x in aws_kms_key.encryption_key : x.arn], [aws_kms_key.replication_key.arn])
   }
-  
+
   statement {
-    sid = "KMSListKeys"
-    actions = [ "kms:ListKeys"]
-    resources = [ "*" ]
+    sid       = "KMSListKeys"
+    actions   = ["kms:ListKeys"]
+    resources = ["*"]
   }
-  
+
   statement {
     sid = "FiggySSMAccess"
     actions = [
-    "ssm:DeleteParameter",
-    "ssm:DeleteParameters",
-    "ssm:GetParameter",
-    "ssm:GetParameters",
-    "ssm:GetParameterHistory",
-    "ssm:GetParametersByPath",
-    "ssm:PutParameter",
-    "ssm:AddTagsToResource"
-  ]
+      "ssm:DeleteParameter",
+      "ssm:DeleteParameters",
+      "ssm:GetParameter",
+      "ssm:GetParameters",
+      "ssm:GetParameterHistory",
+      "ssm:GetParametersByPath",
+      "ssm:PutParameter",
+      "ssm:AddTagsToResource"
+    ]
     resources = distinct(concat(
       [
-        for x in local.root_namespaces:
-          format("arn:aws:ssm:*:%s:parameter%s/*", data.aws_caller_identity.current.account_id, x)
+        for x in var.cfgs.root_namespaces :
+        format("arn:aws:ssm:*:%s:parameter%s/*", data.aws_caller_identity.current.account_id, x)
       ],
       [
-        for ns in local.global_read_namespaces:
-          "arn:aws:ssm:*:${data.aws_caller_identity.current.account_id}:parameter${ns}/*"
+        for ns in var.cfgs.global_read_namespaces :
+        "arn:aws:ssm:*:${data.aws_caller_identity.current.account_id}:parameter${ns}/*"
       ]
     ))
   }
 
   statement {
-    sid = "SSMDescribe"
-    actions = ["ssm:DescribeParameters"]
+    sid       = "SSMDescribe"
+    actions   = ["ssm:DescribeParameters"]
     resources = ["*"]
   }
 }
@@ -175,10 +175,10 @@ data "aws_iam_policy_document" "config_replication_document" {
 
 # Read configs under /figgy namespace
 resource "aws_iam_policy" "lambda_read_configs" {
-  name = "figgy-lambda-read-configs"
-  path = "/"
+  name        = "figgy-lambda-read-configs"
+  path        = "/"
   description = "IAM policy to enable figgy lambdas to read figgy-specific configurations"
-  policy = data.aws_iam_policy_document.lambda_read_figgy_configs.json
+  policy      = data.aws_iam_policy_document.lambda_read_figgy_configs.json
 }
 
 data "aws_iam_policy_document" "lambda_read_figgy_configs" {
@@ -189,13 +189,13 @@ data "aws_iam_policy_document" "lambda_read_figgy_configs" {
       "ssm:GetParameters",
       "ssm:GetParametersByPath"
     ]
-    resources = [ "arn:aws:ssm:*:${data.aws_caller_identity.current.account_id}:parameter/figgy/*"]
+    resources = ["arn:aws:ssm:*:${data.aws_caller_identity.current.account_id}:parameter/figgy/*"]
   }
 
   statement {
-      sid = "SSMDescribe"
-      actions = [ "ssm:DescribeParameters" ]
-      resources = [ "*" ]
-    }
+    sid       = "SSMDescribe"
+    actions   = ["ssm:DescribeParameters"]
+    resources = ["*"]
+  }
 
 }
