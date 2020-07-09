@@ -1,6 +1,6 @@
 module "dynamo_stream_replicator" {
   source                  = "../figgy_lambda"
-  deploy_bucket           = var.cfgs.deploy_bucket
+  deploy_bucket           = var.deploy_bucket
   description             = "Instantly replicates source -> destination configuration changes when someone uses figgy to alter replication mappings."
   handler                 = "functions/dynamo_stream_replicator.handle"
   lambda_name             = "figgy-dynamo-stream-replicator"
