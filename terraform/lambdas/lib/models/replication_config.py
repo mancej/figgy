@@ -50,7 +50,7 @@ class ReplicationConfig:
         namespace = item[REPL_NAMESPACE_ATTR_NAME]
         type = ReplicationType(item[REPL_TYPE_ATTR_NAME])
         user = item[REPL_USER_ATTR_NAME]
-        run_env = RunEnv(item[REPL_RUN_ENV_KEY_NAME])
+        run_env = RunEnv(item.get(REPL_RUN_ENV_KEY_NAME))
 
         return ReplicationConfig(dest, run_env, namespace, source, type, user)
 
