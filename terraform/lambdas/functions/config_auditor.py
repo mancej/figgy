@@ -25,6 +25,7 @@ ACCOUNT_ENV = ssm.get_parameter_value(ACCOUNT_ENV_PS_PATH)
 NOTIFY_DELETES = ssm.get_parameter_value(NOTIFY_DELETES_PS_PATH)
 NOTIFY_DELETES = NOTIFY_DELETES.lower() == "true" if NOTIFY_DELETES else False
 
+FIGGY_NAMESPACES = ssm.get_parameter_value(FIGGY_NAMESPACES_PATH)
 CLEANUP_INTERVAL = 60 * 60  # Cleanup hourly
 LAST_CLEANUP = 0
 

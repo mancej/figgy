@@ -1,7 +1,6 @@
 resource "aws_dynamodb_table" "config_replication" {
   name             = "figgy-config-replication"
   hash_key         = "destination"
-  range_key        = "env_alias"
   billing_mode     = "PAY_PER_REQUEST"
   stream_enabled   = "true"
   stream_view_type = "KEYS_ONLY"
@@ -12,11 +11,6 @@ resource "aws_dynamodb_table" "config_replication" {
 
   attribute {
     name = "destination"
-    type = "S"
-  }
-
-  attribute {
-    name = "env_alias"
     type = "S"
   }
 

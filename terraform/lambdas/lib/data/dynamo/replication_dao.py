@@ -3,7 +3,6 @@ from decimal import *
 from config.constants import *
 from typing import Dict, List, Optional
 from lib.models.replication_config import ReplicationConfig, ReplicationType
-from lib.models.run_env import RunEnv
 
 
 # For interacting with the replication DDB table.
@@ -12,11 +11,10 @@ class ReplicationDao:
         self._dynamo_resource = dynamo_resource
         self._table = self._dynamo_resource.Table(REPL_TABLE_NAME)
 
-    def delete_config(self, destination, run_env) -> None:
+    def delete_config(self, destination) -> None:
         self._table.delete_item(
             Key={
-                REPL_DEST_KEY_NAME: destination,
-                REPL_RUN_ENV_KEY_NAME: run_env
+                REPL_DEST_KEY_NAME: destination
             }
         )
 
@@ -66,9 +64,8 @@ class ReplicationDao:
 
         return results
 
-    def get_config_repl(self, destination, run_env) -> Optional[ReplicationConfig]:
-        filter_exp = Key(REPL_DEST_KEY_NAME).eq(destination) & \
-                     Key(REPL_RUN_ENV_KEY_NAME).eq(run_env)
+    def get_config_repl(self, destination) -> Optional[ReplicationConfig]:
+        filter_exp = Key(REPL_DEST_KEY_NAME).eq(destination)
         result = self._table.query(KeyConditionExpression=filter_exp)
         item = {}
 
@@ -79,10 +76,9 @@ class ReplicationDao:
         else:
             return None
 
-    def put_config_repl(self, destination, svc_env, props) -> None:
+    def put_config_repl(self, destination, props) -> None:
         item = {
             REPL_DEST_KEY_NAME: destination,
-            REPL_RUN_ENV_KEY_NAME: svc_env
         }
 
         for key in props:
