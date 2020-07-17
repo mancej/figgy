@@ -6,7 +6,6 @@ module "figgy_cloud" {
   region = var.region
   env_alias = var.env_alias
   cfgs = merge(local.cfgs, local.bastion_cfgs, local.other_cfgs)
-  extra_auth_types = var.extra_auth_types
   figgy_cw_log_retention = var.figgy_cw_log_retention
   max_session_duration = var.max_session_duration
   notify_deletes = var.notify_deletes
