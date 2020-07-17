@@ -54,7 +54,7 @@ locals {
     }
 
     # Options: "okta", "google", "bastion", "standard"
-    auth_type = "bastion"
+    auth_type = "okta"
 
 
     # Environments with replication key access. This will give all user types access to the figgy replication key.
