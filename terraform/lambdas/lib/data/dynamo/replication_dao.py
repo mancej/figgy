@@ -82,7 +82,7 @@ class ReplicationDao:
         }
 
         for key in props:
-            if key != REPL_DEST_KEY_NAME and key != REPL_RUN_ENV_KEY_NAME and not isinstance(props[key], float):
+            if key != REPL_DEST_KEY_NAME and not isinstance(props[key], float):
                 item[key] = props[key]
             elif isinstance(props[key], float):
                 item[key] = Decimal(f'{props[key]}')

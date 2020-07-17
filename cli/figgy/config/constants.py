@@ -22,7 +22,7 @@ FIGGY_ROLE_PREFIX_OVERRIDE_ENV = 'FIGGY_ROLE_PREFIX_OVERRIDE'
 # Table-specific Constants
 REPL_TABLE_NAME = "figgy-config-replication"
 REPL_DEST_KEY_NAME = "destination"
-REPL_RUN_ENV_KEY_NAME = "run_env"
+REPL_RUN_ENV_KEY_NAME = "env_alias"
 REPL_SOURCE_ATTR_NAME = "source"
 REPL_NAMESPACE_ATTR_NAME = "namespace"
 REPL_TYPE_ATTR_NAME = "type"
