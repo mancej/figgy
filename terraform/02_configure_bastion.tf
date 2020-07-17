@@ -25,7 +25,7 @@ locals {
       # Here, do a mapping of each user and their specified role(s)
       # These will be dynamically provisioned and configured for cross-account role authorizations
       bastion_users = tomap({
-        "jordan.devops": ["devops", "dev", "dba", "sre", "data"]
+        "jordan.devops": ["devops", "dev", "dba", "sre", "data", "admin"]
         "jordan.dba": ["dba"]
         "jordan.sre": ["sre"]
         "jordan.data": ["dba", "data"]
