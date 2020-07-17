@@ -9,7 +9,7 @@ resource "aws_s3_bucket" "figgy_bucket" {
 
   tags = {
     Name       = "figgy"
-    run_env    = var.run_env
+    env_alias    = var.env_alias
     created_by = "figgy"
   }
 

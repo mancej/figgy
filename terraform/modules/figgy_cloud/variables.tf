@@ -1,5 +1,5 @@
-variable "run_env" {
-  description = "Defaults are dev/qa/stage/prod/mgmt but can be anything you like."
+variable "env_alias" {
+  description = "Environment alias. Defaults are dev/qa/stage/prod/mgmt but can be anything you like."
 }
 
 variable "region" {

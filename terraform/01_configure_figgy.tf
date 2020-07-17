@@ -1,4 +1,4 @@
-## Please fill out this file to custom-configure your figgy deployment to meet your needs
+# re# Please fill out this file to custom-configure your figgy deployment to meet your needs
 
 ## IMPORTANT:
 ## If you have already provisioned figgy, rearranging values under `encryption_keys` or `user_types` could require
@@ -15,7 +15,7 @@ locals {
     configure_cloudtrail = true
 
     # How many unique roles will figgy users need? Each of these types should map to a particular figgy user story.
-    role_types = ["devops", "data", "dba", "sre", "dev"]
+    role_types = ["admin", "devops", "data", "dba", "sre", "dev"]
 
     # Encryption keys to allow certain roles to use to encrypt and decrypt secrets stored with figgy.
     # You will map access below
@@ -27,23 +27,25 @@ locals {
     root_namespaces = ["/shared", "/app", "/data", "/devops", "/sre", "/dba"]
 
     # This namespace is where _all_ service specific configurations will be stored. Must be one of the above listed
-    # namespaces. I recommend keeping /app
+    # namespaces. We recommend keeping /app
     service_namespace = "/app"
 
     # Configure access permissions by mapping your role_types to namespace access levels. Be careful to ensure you
     # don't have any typos here. These must match the above `role_types` and `root_namespaces` configurations
     # Format: Map[str:List[str]], or more specifically Map[role_type:List[namespace]]
     role_to_ns_access = {
-      "devops" = ["/app", "/devops", "/data", "/sre", "/shared"],
-      "data" = ["/app", "/data", "/shared"],
-      "sre" = ["/sre", "/app", "/data", "/shared"],
-      "dev" = ["/app", "/shared"],
-      "dba" = ["/dba", "/app", "/shared"]
+      "admin" = ["/shared", "/app", "/data", "/devops", "/sre", "/dba"]
+      "devops" = ["/shared", "/app", "/devops", "/data", "/sre"],
+      "data" = ["/shared", "/app", "/data"],
+      "sre" = ["/shared", "/sre", "/app", "/data"],
+      "dev" = ["/shared", "/app", "/shared"],
+      "dba" = ["/shared", "/dba", "/app"]
     }
 
     # Map role type access to various encryption keys provisioned by figgy.
     # Format: Map[str:List[str]], specifically Map[role_type:List[encryption_key]]
     role_to_kms_access = {
+      "admin" = ["app", "devops", "data"]
       "devops" = [ "devops", "app", "data" ]
       "data" = [ "data", "app" ]
       "dba" = [ "data", "app" ]

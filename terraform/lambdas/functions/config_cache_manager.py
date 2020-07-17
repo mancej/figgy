@@ -15,6 +15,7 @@ log = Utils.get_logger(__name__, logging.INFO)
 dynamo_resource = boto3.resource("dynamodb")
 ssm_client = boto3.client('ssm')
 ssm = SsmDao(ssm_client)
+
 webhook_url = ssm.get_parameter_value(FIGGY_WEBHOOK_URL_PATH)
 slack: SlackService = SlackService(webhook_url=webhook_url)
 ACCOUNT_ID = ssm.get_parameter_value(ACCOUNT_ID_PS_PATH)

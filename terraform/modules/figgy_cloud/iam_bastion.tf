@@ -1,7 +1,7 @@
 
 resource "aws_iam_role" "bastion_user_role" {
   count                = var.cfgs.bastion_enabled ? length(var.cfgs.role_types) : 0
-  name                 = "figgy-${var.run_env}-${var.cfgs.role_types[count.index]}"
+  name                 = "figgy-${var.env_alias}-${var.cfgs.role_types[count.index]}"
   assume_role_policy   = var.cfgs.bastion_enabled ? data.aws_iam_policy_document.bastion_role_policy[count.index].json : ""
   max_session_duration = var.max_session_duration
 }

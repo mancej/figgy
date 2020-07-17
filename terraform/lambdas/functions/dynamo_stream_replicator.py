@@ -34,9 +34,11 @@ def handle(event, context):
                 keys = ddb_record.get("Keys", {})
                 destination = keys.get(REPL_DEST_KEY_NAME, {}).get("S", None)
                 run_env = keys.get(REPL_RUN_ENV_KEY_NAME, {}).get("S", None)
+
                 if destination and run_env:
                     log.info(f"Record updated with key: {destination} and run_env: {run_env}")
                     config: ReplicationConfig = repl_dao.get_config_repl(destination, run_env)
+
                     if config:
                         log.info(f"Got config: {config}, syncing...")
                         repl_svc.sync_config(config) and notify_slack(config)

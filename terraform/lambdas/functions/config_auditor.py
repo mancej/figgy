@@ -89,7 +89,7 @@ def handle(event, context):
                 )
 
                 if not ps_value:
-                    ps_value = get_parameter_value(ps_name)
+                    ps_value = ssm.get_parameter_value(ps_name)
 
                 audit.put_audit_log(
                     user,
@@ -126,12 +126,6 @@ def handle(event, context):
         )
         slack.send_message(message)
         raise e
-
-
-def get_parameter_value(key):
-    ssm = boto3.client("ssm")
-    parameter = ssm.get_parameter(Name=key, WithDecryption=False)
-    return parameter["Parameter"]["Value"]
 
 
 if __name__ == "__main__":

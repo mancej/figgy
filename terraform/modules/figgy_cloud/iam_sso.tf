@@ -7,11 +7,11 @@ resource "aws_iam_saml_provider" "provider" {
 }
 
 # Be careful if you change this name, it is used by SSO integrations. When we retrieve the SAML assertion from our SSO provider,
-# the role ARNs provide us the accountId -> run_env -> role mapping that is necessary for Figgy to operate properly.
-# The name format MUST be something-${var.run_env}-${role_type} - you MAY replace 'figgy' with anything else you like.
+# the role ARNs provide us the accountId -> env_alias -> role mapping that is necessary for Figgy to operate properly.
+# The name format MUST be something-${var.env_alias}-${role_type} - you MAY replace 'figgy' with anything else you like.
 resource "aws_iam_role" "sso_user_role" {
   count                = var.cfgs.enable_sso ? length(var.cfgs.role_types) : 0
-  name                 = "figgy-${var.run_env}-${var.cfgs.role_types[count.index]}"
+  name                 = "figgy-${var.env_alias}-${var.cfgs.role_types[count.index]}"
   assume_role_policy   = var.cfgs.enable_sso ? data.aws_iam_policy_document.sso_role_policy[0].json : ""
   max_session_duration = var.max_session_duration
 }

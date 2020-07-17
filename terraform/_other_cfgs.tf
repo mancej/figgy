@@ -7,7 +7,8 @@ locals {
     # Global read namespaces
     global_read_namespaces = [
       "/shared",
-      "/figgy"]
+      "/figgy"
+    ]
 
     # Merged config based on user selections
     enable_sso = local.cfgs.auth_type == "okta" || local.cfgs.auth_type == "google"

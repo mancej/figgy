@@ -109,10 +109,10 @@ resource "aws_ssm_parameter" "account_id" {
   overwrite   = true
 }
 
-resource "aws_ssm_parameter" "run_env" {
-  name        = "/figgy/run_env"
+resource "aws_ssm_parameter" "env_alias" {
+  name        = "/figgy/env_alias"
   type        = "String"
-  value       = var.run_env
+  value       = var.env_alias
   description = "This is the Figgy Run Environment associated with this account."
   overwrite   = true
 }

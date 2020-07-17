@@ -74,9 +74,9 @@ Figgy supports SAML based SSO integrations with multi-factor authentication. Sim
     - Give Developers confidence their code will bootstrap properly if Figgy gives the thumbs-up! 
     - Easily determine application dependencies in _one place_ by looking at your application's **Fig Tree** 
 
-- **The Figgy Vault**
-    - Figgy _only_ generates temporary sessions to AWS, encrypts them, and stores them locally in your personal "Figgy Vault"
-    - These temporary credentials can be used for local development by decrypting & pulling them from the vault.
+- **The Figgy Lockbox**
+    - Figgy _only_ generates temporary sessions to AWS, encrypts them, and stores them locally in your personal "Figgy Lockbox"
+    - These temporary credentials can be used for local development by decrypting & pulling them from the lockbox.
 
 - **Slack integration**
     - Get automated notifications to slack when secrets are changed or updated, and know who made them.

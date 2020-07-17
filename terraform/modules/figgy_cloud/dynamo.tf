@@ -1,7 +1,7 @@
 resource "aws_dynamodb_table" "config_replication" {
   name             = "figgy-config-replication"
   hash_key         = "destination"
-  range_key        = "run_env"
+  range_key        = "env_alias"
   billing_mode     = "PAY_PER_REQUEST"
   stream_enabled   = "true"
   stream_view_type = "KEYS_ONLY"
@@ -16,13 +16,13 @@ resource "aws_dynamodb_table" "config_replication" {
   }
 
   attribute {
-    name = "run_env"
+    name = "env_alias"
     type = "S"
   }
 
   tags = {
     Name        = "figgy-config-replication"
-    Environment = var.run_env
+    Environment = var.env_alias
     owner       = "devops"
     application = "figgy"
     created_by  = "figgy"
@@ -51,7 +51,7 @@ resource "aws_dynamodb_table" "config_auditor" {
 
   tags = {
     Name        = "figgy-config-auditor"
-    Environment = var.run_env
+    Environment = var.env_alias
     owner       = "devops"
     application = "figgy"
     created_by  = "figgy"
@@ -76,7 +76,7 @@ resource "aws_dynamodb_table" "config_cache" {
 
   tags = {
     Name        = "figgy-config-cache"
-    Environment = var.run_env
+    Environment = var.env_alias
     owner       = "devops"
     application = "figgy"
     created_by  = "figgy"
