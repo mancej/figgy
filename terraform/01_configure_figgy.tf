@@ -38,7 +38,7 @@ locals {
       "devops" = ["/shared", "/app", "/devops", "/data", "/sre"],
       "data" = ["/shared", "/app", "/data"],
       "sre" = ["/shared", "/sre", "/app", "/data"],
-      "dev" = ["/shared", "/app", "/shared"],
+      "dev" = ["/shared", "/app"],
       "dba" = ["/shared", "/dba", "/app"]
     }
 
@@ -54,7 +54,7 @@ locals {
     }
 
     # Options: "okta", "google", "bastion", "standard"
-    auth_type = "bastion"
+    auth_type = "okta"
 
     # Environments with replication key access. This will give all user types access to the figgy replication key.
     # and enable users to run services locally and decrypt secrets shared with their application. Ideal for
