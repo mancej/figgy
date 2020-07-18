@@ -38,7 +38,7 @@ locals {
       "devops" = ["/shared", "/app", "/devops", "/data", "/sre"],
       "data" = ["/shared", "/app", "/data"],
       "sre" = ["/shared", "/sre", "/app", "/data"],
-      "dev" = ["/shared", "/app", "/shared"],
+      "dev" = ["/shared", "/app"],
       "dba" = ["/shared", "/dba", "/app"]
     }
 
