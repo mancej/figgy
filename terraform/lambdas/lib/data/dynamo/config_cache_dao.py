@@ -3,10 +3,10 @@ import logging
 from dataclasses import dataclass
 from enum import Enum
 
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Key, Attr
 
 from lib.utils.utils import Utils
-from typing import Set, Dict, List
+from typing import Set, Dict, List, Any
 
 from config.constants import *
 
@@ -96,9 +96,46 @@ class ConfigCacheDao:
 
         self._cache_table.put_item(Item=item)
 
-    def get_deleted_configs(self) -> List[ConfigItem]:
-        all_configs = self.get_all_configs()
-        return [config for config in all_configs if config.state == ConfigState.DELETED]
+    def get_deleted_configs(self) -> Set[ConfigItem]:
+        filter_exp = Attr(CONFIG_CACHE_STATE_ATTR_NAME).eq(CONFIG_CACHE_STATE_DELETED)
+        return self.get_configs_with_filter(filter_exp=filter_exp)
+
+    def get_active_configs(self) -> Set[ConfigItem]:
+        filter_exp = Attr(CONFIG_CACHE_STATE_ATTR_NAME).eq(CONFIG_CACHE_STATE_ACTIVE)
+
+        return self.get_configs_with_filter(filter_exp=filter_exp)
+
+    def get_configs_with_filter(self, filter_exp: Any = None, start_key: str = None) -> Set[ConfigItem]:
+        """
+        Retrieve all key names from the Dynamo DB config-cache table in each account. Much more efficient than
+        querying SSM directly.
+        Args:
+            filter_exp: A valid dynamodb filter expression to apply to the scan
+            start_key: Optional: Is used for recursive paginated lookups to get the full data set. This should not
+            be passed in by the user.
+        Returns:
+
+        """
+        start_time = time.time()
+        if start_key:
+            log.info(f"Recursively scanning with start key: {start_key}")
+            result = self._cache_table.scan(FilterExpression=filter_exp, ExclusiveStartKey=start_key)
+        else:
+            result = self._cache_table.scan(FilterExpression=filter_exp)
+
+        configs: Set[ConfigItem] = set()
+        if "Items" in result and len(result['Items']) > 0:
+            for item in result['Items']:
+                configs.add(ConfigItem.from_dict(item))
+
+        if 'LastEvaluatedKey' in result:
+            configs = configs | self.get_configs_with_filter(filter_exp=filter_exp, start_key=result['LastEvaluatedKey'])
+
+        log.info(
+            f"Returning config names from dynamo cache after: {time.time() - start_time} "
+            f"seconds with {len(configs)} configs.")
+
+        return configs
 
     def get_all_configs(self, start_key: str = None) -> Set[ConfigItem]:
         """

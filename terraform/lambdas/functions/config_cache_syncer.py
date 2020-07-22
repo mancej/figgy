@@ -5,7 +5,7 @@ import logging
 import time
 import json
 from config.constants import *
-from lib.data.dynamo.config_cache_dao import ConfigCacheDao, ConfigItem
+from lib.data.dynamo.config_cache_dao import ConfigCacheDao, ConfigItem, ConfigState
 from lib.data.ssm.ssm import SsmDao
 from lib.models.slack import SimpleSlackMessage, SlackColor
 from lib.svcs.slack import SlackService
@@ -27,7 +27,7 @@ def remove_old_deleted_items():
     """
     Cleanup items marked as DELETED that are > MAX_AGE old
     """
-    deleted_items: List[ConfigItem] = cache_dao.get_deleted_configs()
+    deleted_items: Set[ConfigItem] = cache_dao.get_deleted_configs()
     for item in deleted_items:
         if int(time.time() * 1000) - item.last_updated > MAX_DELETED_AGE:
             log.info(f"Item: {item.name} is older than {MAX_DELETED_AGE / 1000}"
@@ -38,11 +38,10 @@ def remove_old_deleted_items():
 def handle(event, context):
     try:
         param_names = ssm_dao.get_all_param_names(namespaces)
-        cached_configs: Set[ConfigItem] = cache_dao.get_all_configs()
+        cached_configs: Set[ConfigItem] = cache_dao.get_active_configs()
         cached_names = set([config.name for config in cached_configs])
         missing_params: Set[str] = param_names.difference(cached_names)
         names_to_delete: Set[str] = cached_names.difference(param_names)
-        to_delete = [item.name for item in cached_configs if item.name in names_to_delete]
 
         for param in missing_params:
             log.info(f"Storing in cache: {param}")
@@ -50,12 +49,15 @@ def handle(event, context):
             cache_dao.put_in_cache(param)
             [cache_dao.delete(item) for item in items]  # If any dupes exist, get rid of em
 
-        for param in to_delete:
-            log.info(f"Deleting from cache: {param}")
+        for param in names_to_delete:
             items: Set[ConfigItem] = cache_dao.get_items(param)
             sorted_items = sorted(items)
             [cache_dao.delete(item) for item in sorted_items[:-1]]  # Delete all but the most recent item.
-            cache_dao.mark_deleted(sorted_items[-1])
+
+            # Double check that item is missing before deleting in case it was just added.
+            if not ssm_dao.get_parameter_value(param):
+                log.info(f"Deleting from cache: {param}")
+                cache_dao.mark_deleted(sorted_items[-1])
 
         remove_old_deleted_items()
 
