@@ -33,17 +33,16 @@ def handle(event, context):
                 ddb_record = record.get("dynamodb", {})
                 keys = ddb_record.get("Keys", {})
                 destination = keys.get(REPL_DEST_KEY_NAME, {}).get("S", None)
-                run_env = keys.get(REPL_RUN_ENV_KEY_NAME, {}).get("S", None)
 
-                if destination and run_env:
-                    log.info(f"Record updated with key: {destination} and run_env: {run_env}")
-                    config: ReplicationConfig = repl_dao.get_config_repl(destination, run_env)
+                if destination:
+                    log.info(f"Record updated with key: {destination}")
+                    config: ReplicationConfig = repl_dao.get_config_repl(destination)
 
                     if config:
                         log.info(f"Got config: {config}, syncing...")
                         repl_svc.sync_config(config) and notify_slack(config)
                     else:
-                        log.warning(f"Unable to find record with destination: {destination} and {run_env}. This *could* "
+                        log.warning(f"Unable to find record with destination: {destination}. This *could* "
                                     f"indicate a serious issue with replication. If you see lots of these, please pay "
                                     f"attention.")
             else:
