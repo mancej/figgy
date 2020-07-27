@@ -60,7 +60,7 @@ class FigReplicationMessage(SlackMessage):
                f"*Env*:          {self.replication_cfg.run_env}\n"\
                f"{extra_note}" \
                f"For more information on what this means, check out the " \
-               "<https://www.figgy.dev/docs/getting-started/basics/#the-solution-config-replication|Figgy Docs>"
+               "<https://www.figgy.dev/getting-started/basics/#the-solution-config-replication|Figgy Docs>"
 
         return \
             {
