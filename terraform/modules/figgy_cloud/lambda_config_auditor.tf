@@ -10,7 +10,9 @@ module "config_auditor" {
   layers                  = [var.cfgs.aws_sdk_layer_map[var.region]]
   cw_lambda_log_retention = var.figgy_cw_log_retention
   sns_alarm_topic         = aws_sns_topic.figgy_alarms.arn
-  sha256 = data.archive_file.figgy.output_base64sha256
+  sha256                  = data.archive_file.figgy.output_base64sha256
+  memory_size             = 256
+  concurrent_executions   = 5
 }
 
 module "config_auditor_trigger" {

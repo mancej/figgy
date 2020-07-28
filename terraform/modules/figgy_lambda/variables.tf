@@ -47,3 +47,8 @@ variable "sns_alarm_topic" {
 variable "sha256" {
   description = "Sha256 of provided data archive"
 }
+
+variable "memory_size" {
+  description = "Amount of memory to provision for this lambda"
+  default = 128
+}

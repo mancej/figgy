@@ -74,15 +74,15 @@ class ConfigCacheDao:
 
         return items
 
-    def mark_deleted(self, item: ConfigItem) -> None:
+    def mark_deleted(self, item: ConfigItem, timestamp: int = int(time.time() * 1000)) -> None:
         """
         Marks an item as "DELETED" in the DB and resets the last_updated time. This will prompt the CLI to remove
         this item from its local cache on next invocation.
         """
         self.delete(item)
-        self.put_in_cache(item.name, state=CONFIG_CACHE_STATE_DELETED)
+        self.put_in_cache(item.name, state=CONFIG_CACHE_STATE_DELETED, timestamp=timestamp)
 
-    def put_in_cache(self, name: str, state=CONFIG_CACHE_STATE_ACTIVE):
+    def put_in_cache(self, name: str, state=CONFIG_CACHE_STATE_ACTIVE, timestamp: int = int(time.time() * 1000)):
         """
         Stores a new parameter into the cache table and sets the last_updated to now
         :param name: Name of parameter to store
@@ -91,7 +91,7 @@ class ConfigCacheDao:
         item = {
             CONFIG_CACHE_PARAM_NAME_KEY: name,
             CONFIG_CACHE_STATE_ATTR_NAME: state,
-            CONFIG_CACHE_LAST_UPDATED_KEY: int(time.time() * 1000)
+            CONFIG_CACHE_LAST_UPDATED_KEY: timestamp
         }
 
         self._cache_table.put_item(Item=item)

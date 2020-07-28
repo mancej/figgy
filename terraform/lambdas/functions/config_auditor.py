@@ -1,7 +1,9 @@
 import random
 import time
+from datetime import datetime
 
 import boto3
+import time
 import logging
 from config.constants import *
 from lib.models.replication_config import ReplicationConfig
@@ -61,6 +63,13 @@ def handle(event, context):
         ps_names = request_params.get('names', [])
         ps_name = [request_params['name']] if 'name' in request_params else []
         ps_names = ps_names + ps_name
+        event_time = detail.get('eventTime')
+
+        # Convert to millis since epoch
+        if event_time:
+            event_time = int(datetime.strptime(event_time, "%Y-%m-%dT%H:%M:%SZ").timestamp() * 1000)
+        else:
+            event_time = int(time.time() * 1000)
 
         log.info(f"Got user: {user}, action: {action} for parameter(s) {ps_names}")
 
@@ -68,26 +77,14 @@ def handle(event, context):
             ps_name = f'/{ps_name}' if not ps_name.startswith('/') else ps_name
 
             if action == DELETE_PARAM_ACTION or action == DELETE_PARAMS_ACTION:
-                audit.put_delete_log(user, action, ps_name)
+                audit.put_delete_log(user, action, ps_name, timestamp=event_time)
                 notify_delete(ps_name, user)
             elif action == PUT_PARAM_ACTION:
-                ps_value = (
-                    detail["requestParameters"]["value"]
-                    if "value" in detail["requestParameters"]
-                    else None
-                )
-                ps_type = detail["requestParameters"]["type"]
-                ps_description = (
-                    detail["requestParameters"]["description"]
-                    if "description" in detail["requestParameters"]
-                    else None
-                )
-                ps_version = detail["responseElements"]["version"]
-                ps_key_id = (
-                    detail["requestParameters"]["keyId"]
-                    if "keyId" in detail["requestParameters"]
-                    else None
-                )
+                ps_value = request_params.get("value")
+                ps_type = request_params.get("type")
+                ps_description = request_params.get("description")
+                ps_version = detail["responseElements"].get("version")
+                ps_key_id = request_params.get("keyId")
 
                 if not ps_value:
                     ps_value = ssm.get_parameter_value(ps_name)
@@ -101,6 +98,7 @@ def handle(event, context):
                     ps_key_id,
                     ps_description,
                     ps_version,
+                    timestamp=event_time,
                 )
             else:
                 log.info(f"Unsupported action type found! --> {action}")
@@ -116,7 +114,7 @@ def handle(event, context):
     except Exception as e:
         log.error(e)
         message = f"The following error occurred in an the figgy-ssm-stream-replicator lambda. " \
-                  f"If this appears to be a bug with figgy, please tell us by submitting a GitHub issue!" \
+                  f"If this appears to be a bug with Figgy, please tell us by submitting a GitHub issue!" \
                   f" \n\n{Utils.printable_exception(e)}"
 
         title = "Figgy experienced an irrecoverable error!"
