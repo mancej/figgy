@@ -14,7 +14,8 @@ resource "aws_lambda_function" "figgy_lambda" {
   source_code_hash = var.sha256
   reserved_concurrent_executions = var.concurrent_executions
   depends_on       = [aws_iam_role.figgy_role, aws_s3_bucket_object.figgy_deploy]
-  layers = var.layers
+  layers           = var.layers
+  memory_size      = var.memory_size
 }
 
 resource "aws_s3_bucket_object" "figgy_deploy" {

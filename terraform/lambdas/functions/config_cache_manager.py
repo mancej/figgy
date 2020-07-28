@@ -2,7 +2,8 @@ from typing import Set
 
 import boto3
 import logging
-
+from datetime import datetime
+import time
 from lib.data.ssm import SsmDao
 from lib.models.slack import SimpleSlackMessage, SlackColor
 from lib.svcs.slack import SlackService
@@ -36,6 +37,14 @@ def handle(event, context):
         action = detail["eventName"]
         params = detail.get('requestParameters', {})
         ps_name = params.get('name') if params else None
+
+        event_time = detail.get('eventTime')
+
+        # Convert to millis since epoch
+        # if event_time:
+        #     event_time = int(datetime.strptime(event_time, "%Y-%m-%dT%H:%M:%SZ").timestamp() * 1000)
+        # else:
+        #     event_time = int(time.time() * 1000)
 
         if not ps_name:
             log.info(f"Received an event missing parameterStore path: {event}")

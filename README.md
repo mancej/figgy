@@ -1,7 +1,7 @@
 ![E2E Integration Test Suite](https://github.com/figtools/figgy-cli/workflows/E2E%20Integration%20Test%20Suite/badge.svg?branch=master)
 ![Binary Tests](https://github.com/figtools/figgy-cli/workflows/Binary%20Tests/badge.svg?branch=master)
 ![Build & Deploy](https://github.com/figtools/figgy-cli/workflows/Build%20&%20Deploy/badge.svg?branch=master)
-![Release](https://github.com/figtools/figgy-cli/workflows/Release/badge.svg?branch=master)
+![Release](https://github.com/figtools/figgy-cli/workflows/Release/badge.svg)
 
 # Figgy
 
