@@ -45,7 +45,6 @@ class ConfigItem:
             raise ValueError(f"Cannot compare {self.__class__} against {other.__class__}")
 
 
-
 class ConfigCacheDao:
 
     def __init__(self, ddb_resource):
@@ -74,20 +73,25 @@ class ConfigCacheDao:
 
         return items
 
-    def mark_deleted(self, item: ConfigItem, timestamp: int = int(time.time() * 1000)) -> None:
+    def mark_deleted(self, item: ConfigItem, timestamp: int = 0) -> None:
         """
         Marks an item as "DELETED" in the DB and resets the last_updated time. This will prompt the CLI to remove
         this item from its local cache on next invocation.
         """
+        timestamp = timestamp if timestamp else int(time.time() * 1000)
+
         self.delete(item)
         self.put_in_cache(item.name, state=CONFIG_CACHE_STATE_DELETED, timestamp=timestamp)
 
-    def put_in_cache(self, name: str, state=CONFIG_CACHE_STATE_ACTIVE, timestamp: int = int(time.time() * 1000)):
+    def put_in_cache(self, name: str, state=CONFIG_CACHE_STATE_ACTIVE, timestamp: int = 0):
         """
         Stores a new parameter into the cache table and sets the last_updated to now
         :param name: Name of parameter to store
         :param state: state to set in the cache
         """
+
+        timestamp = timestamp if timestamp else int(time.time() * 1000)
+
         item = {
             CONFIG_CACHE_PARAM_NAME_KEY: name,
             CONFIG_CACHE_STATE_ATTR_NAME: state,
@@ -129,7 +133,8 @@ class ConfigCacheDao:
                 configs.add(ConfigItem.from_dict(item))
 
         if 'LastEvaluatedKey' in result:
-            configs = configs | self.get_configs_with_filter(filter_exp=filter_exp, start_key=result['LastEvaluatedKey'])
+            configs = configs | self.get_configs_with_filter(filter_exp=filter_exp,
+                                                             start_key=result['LastEvaluatedKey'])
 
         log.info(
             f"Returning config names from dynamo cache after: {time.time() - start_time} "
