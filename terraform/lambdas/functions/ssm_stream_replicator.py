@@ -52,7 +52,7 @@ def handle(event, context):
     try:
         log.info(f"Event: {event}")
         detail = event["detail"]
-        action = detail["eventName"]
+        action = detail.get("eventName")
 
         if 'errorMessage' in detail:
             log.info(f'Not processing event due to this being an error event with message: {detail["errorMessage"]}')

@@ -34,7 +34,7 @@ def handle(event, context):
         cache_dao: ConfigCacheDao = ConfigCacheDao(dynamo_resource)
 
         detail = event["detail"]
-        action = detail["eventName"]
+        action = detail.get("eventName")
         params = detail.get('requestParameters', {})
         ps_name = params.get('name') if params else None
 
