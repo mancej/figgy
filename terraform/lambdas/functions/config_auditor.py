@@ -51,7 +51,7 @@ def handle(event, context):
     try:
         log.info(f"Event: {event}")
         detail = event["detail"]
-        user_arn = detail["userIdentity"]["arn"]
+        user_arn = detail.get("userIdentity", {}).get("arn", "UserArnUnknown")
         user = user_arn.split("/")[-1:][0]
         action = detail.get("eventName")
 
@@ -83,7 +83,7 @@ def handle(event, context):
                 ps_value = request_params.get("value")
                 ps_type = request_params.get("type")
                 ps_description = request_params.get("description")
-                ps_version = detail["responseElements"].get("version")
+                ps_version = detail.get("responseElements", {}).get("version", 1)
                 ps_key_id = request_params.get("keyId")
 
                 if not ps_value:
