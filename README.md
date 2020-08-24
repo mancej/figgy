@@ -3,9 +3,12 @@
 ![Build & Deploy](https://github.com/figtools/figgy-cli/workflows/Build%20&%20Deploy/badge.svg?branch=master)
 ![Release](https://github.com/figtools/figgy-cli/workflows/Release/badge.svg)
 
+<img src=".assets/media/svg/Brand/Lockups/Dark.svg" width="150" alt="Figgy"/>
+
+
 # Figgy
 
-Cultivate configuration clarity with Figgy. Open-source, cloud-native, configuration & secret management in AWS.
+Open-source, cloud-native, configuration & secret management in AWS.
 
 **Learn everything you need to know about Figgy by checking out the website:**
 
@@ -33,7 +36,7 @@ are missing and application deployments are destined to fail.
 > **Control user access like a champ**
 
 
-Figgy makes it easy to set up and control access to across all of your AWS environments and configuration namespaces. Consider
+Figgy makes it easy to set up and control access across all of your AWS environments and configuration namespaces. Consider
 your role types and use cases, map them up in a simple config file, and let Figgy do the rest. Audit all user activity and 
 changes over time, and roll back any config or group of configurations to any point-in-time -- to the second!
 
@@ -44,7 +47,7 @@ changes over time, and roll back any config or group of configurations to any po
 Figgy supports SAML based SSO integrations with multi-factor authentication. Simplify AWS access control with Figgy!
 
 
-> **Feature rich CLI to speed-up your development workflow.**
+> **Feature-rich CLI to speed-up your development workflow.**
 
 <br/>
 
@@ -63,7 +66,7 @@ Figgy supports SAML based SSO integrations with multi-factor authentication. Sim
 **Figgy will help you:**
 
 - Establish secure best practices from the start
-- Prevent failed deployments and application downtime due to configuration mismanagmeent
+- Prevent failed deployments and application downtime due to configuration mismanagment
 - Save you time by automating simple configuration management tasks
 - Give you peace of mind through high availability and resiliency, versioned configurations, audit logs, and easy rollbacks or restores.
 - Keep secrets with their owners by cutting out the middle-man and establishing a strong framework of least-privilege. 
@@ -87,14 +90,14 @@ Detect and remedy misconfigurations before deployment rather than scrambling aft
 ---
 #### Let the secret owners own the secrets
 Figgy establishes a framework for teams of secret owners to securely track, manage, and rotate their secrets in their 
-team’s secure space. From that space they can share secrets directly with the applications that need them -- 
+team’s secure space. From that space, they can share secrets directly with the applications that need them -- 
 without going through a middle-man. No more LastPass, one-time urls, secrets sent over Slack, email, encrypted files, 
 or any of those annoying secret management hoops. In a few weeks, when your coworker "Bill" finds new employment, 
 don’t ask yourself, "What secrets passed through Bill that we need to rotate now?"
 
 ---
 #### Easily manage and maintain least privilege
-Figgy makes it easy to give both users and applications the exact amount of access they need and nothing more, and provides
+Figgy makes it easy to give both users and applications the exact amount of access they need and nothing more and provides
 a framework for scalably maintaining and enforcing least privilege. By following Figgy best
 practices you can easily maintain appropriate access for users and services while keeping your IAM policies short and sweet.
 

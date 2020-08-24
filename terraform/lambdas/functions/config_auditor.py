@@ -59,6 +59,10 @@ def handle(event, context):
             log.info(f'Not processing event due to this being an error event with message: {detail["errorMessage"]}')
             return
 
+        if 'errorCode' in detail:
+            log.info(f'Not processing event due to error code: {detail["errorCode"]}')
+            return
+
         request_params = detail.get('requestParameters', {})
         ps_names = request_params.get('names', [])
         ps_name = [request_params['name']] if 'name' in request_params else []

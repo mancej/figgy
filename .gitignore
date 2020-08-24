@@ -35,3 +35,4 @@ assertion.xml
 #
 ## Pyinstalelr stuffs
 #*.spec
+.DS_store
